@@ -393,6 +393,8 @@ class Decoder(object):
 
         for cp in codepoints:
             decoded = self._decode_codepoint(cp)
+            if decoded is None:
+                return
             for character in decoded:
                 # TODO optimize, casting back to bytes when bytes above
                 yield bytes((character,))
@@ -433,7 +435,10 @@ class Decoder(object):
                     self._codepoints[len(self._codepoints)] = (
                         self._prefix + bytes((ret[0],)))
             else:
-                ret = self._prefix + bytes((self._prefix[0],))
+                if self._prefix is not None:
+                    ret = self._prefix + bytes((self._prefix[0],))
+                else:
+                    ret = self._prefix
                 self._codepoints[len(self._codepoints)] = ret
 
             self._prefix = ret
